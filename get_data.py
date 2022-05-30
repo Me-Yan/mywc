@@ -17,8 +17,8 @@ class GetData:
         login_url =  "%s/web/user/login" % GetData.basic_path
 
         user_data = {
-            "phone": "18380448173",
-            "pwd": "Mjustforyou9496"
+            "phone": "xxxxxxxx",
+            "pwd": "xxxxxxxx"
         }
 
         ss = requests.session()
@@ -71,12 +71,13 @@ class GetData:
     def process_data(self, goods_Data):
 
         if goods_Data:
-            sql = "INSERT INTO goods (gid, cid, sid, period, name, price, belong, nickname) VALUES"
+            sql = "INSERT INTO goods (gid, cid, sid, mode, period, name, price, belong, nickname) VALUES"
 
             for item in goods_Data:
                 gid = item['gid']
                 cid = item['cid']
                 sid = item['sid']
+                mode = int(item['state'])
                 period = "上午"
                 if sid == 9:
                     period = "下午"
@@ -84,9 +85,9 @@ class GetData:
                 price = item['price']
                 price = round(float(price) / 100, 2)
                 belong = item['belong']
-                nickname = item['belong_nickname']
+                nickname = item['belong_nickname'] if "belong_nickname" in item else ""
 
-                item_sql = "(%d, %d, %d, '%s', '%s', %.2f, %d, '%s')," % (gid, cid, sid, period, name, price, belong, nickname)
+                item_sql = "(%d, %d, %d, %d, '%s', '%s', %.2f, %d, '%s')," % (gid, cid, sid, mode, period, name, price, belong, nickname)
                 sql = "%s%s" % (sql, item_sql)
 
             sql = "%s;" % sql.rstrip(',')
