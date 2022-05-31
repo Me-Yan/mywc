@@ -22,6 +22,8 @@ class Database:
 
     def insert_goods_data(self, sql):
 
+        print(sql)
+
         db = self.create_db_connection()
 
         cursor = db.cursor()
