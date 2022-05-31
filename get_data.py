@@ -1,5 +1,6 @@
-import _thread
 import json
+import time
+from datetime import datetime
 import requests
 
 
@@ -8,8 +9,13 @@ class GetData:
     def __init__(self):
         with open("data.json", "r", encoding="utf-8") as data_file:
             self.basic_json = json.load(data_file)
+
+        with open("user.json", "r", encoding="utf-8") as user_file:
+            self.login_data = json.load(user_file)
+
         self.token = None
         self.session = None
+        self.address_info = None
 
     def login(self):
         """
@@ -21,7 +27,7 @@ class GetData:
 
         login_url = "%s%s" % (self.basic_json["basic_path"], self.basic_json["urls"]["login_url"])
 
-        user_data = self.basic_json["user"]
+        user_data = self.login_data
 
         ss = requests.session()
         res = ss.post(url=login_url, json=user_data, headers=self.basic_json["basic_header"])
@@ -29,6 +35,8 @@ class GetData:
         res_json = res.json()
 
         print(res_json)
+
+        self.address_info = res_json["data"]["address_list"][0]
 
         self.token = res_json['data']['token']
         self.session = ss
@@ -152,65 +160,66 @@ class GetData:
             "sid": sid,
             "mode": "%d" % mode,
             "token": "%s" % self.token,
-            "address_info": {
-                "id": 147,
-                "uid": 198,
-                "name": "Amos",
-                "phone": "18380448173",
-                "province": "四川省",
-                "city": "成都市",
-                "county": "双流区",
-                "detail": "中和街道",
-                "isdefault": 1,
-                "create_time": "2022-05-26 01:52:25"
-            }
+            "address_info": "%s" % self.address_info
         }
 
-        # for index in range(0, 2):
         res = self.session.post(url=req_url, json=req_data, headers=self.basic_json["basic_header"])
-        print(res.json())
 
-    def visit_all_goods(self):
+        return res.json()
 
-        goods_list = self.get_all_data([9], [0, 1])
-
-        count = 0
-        if goods_list:
-            while True:
-                print(goods_list)
-                for item in goods_list:
-                    gid = item['gid']
-                    cid = item['cid']
-                    sid = item['sid']
-                    mode = int(item['state'])
-                    self.submit_order(gid=gid, cid=cid, sid=sid, mode=mode)
-                    count += 1
-                    print(count)
-
-    def create_thread(self, number):
+    def visit_all_goods(self, count, price_period, delay_seconds):
         """
-        创建线程执行任务
-        :param number:
+        轮询所有商品
         :return:
         """
-        goods_list = self.get_all_data([9], [0, 1])
 
-        for item in range(0, number):
-            _thread.start_new_thread(self.visit_all_goods, (goods_list,))
+        now = datetime.now()
+        now_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")
+        now_date = now.strftime("%Y-%m-%d")
 
+        flag_datetime_str = "%s 12:00:00.000000" % now_date
+        flag_datetime = time.strptime(flag_datetime_str, "%Y-%m-%d %H:%M:%S.%f")
+        now_datetime = time.strptime(now_str, "%Y-%m-%d %H:%M:%S.%f")
 
+        if int(time.mktime(now_datetime)) <= int(time.mktime(flag_datetime)):
+            sid = 1
+            index_list = [0, 5]
+            begin_datetime = "%s 14:00:00.000000" % now_date
+        else:
+            sid = 9
+            index_list = [0, 1]
+            begin_datetime = "%s 10:30:00.000000" % now_date
 
+        period_list = [sid]
 
+        print("now_str:%s, flag_datetime_str:%s, begin_datetime:%s, sid:%d" %(now_str, flag_datetime_str, begin_datetime, sid))
 
+        goods_list = self.get_all_data(period_list, index_list)
 
+        visit_count = 0
+        success_count = 0
+        if goods_list:
+            while True:
+                print("now:%s" % datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"))
+                if int(round(time.time() * 1000000)) >= (int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f")))* 1000000+int(1000000*delay_seconds)):
+                    print(goods_list)
+                    for item in goods_list:
+                        gid = item['gid']
+                        cid = item['cid']
+                        sid = item['sid']
+                        mode = int(item['state'])
+                        price = round(float(price) / 100, 2)
 
+                        if price>=price_period[0] and price<=price_period[1]:
+                            res_data = self.submit_order(gid=gid, cid=cid, sid=sid, mode=mode)
+                            if res_data["res_code"] == 1 and res_data["msg"] == "抢购成功，请尽快支付!":
+                                success_count += 1
 
+                        if success_count >= count:
+                            break
 
-
-
-
-
-
-
-
+                        visit_count += 1
+                        print(count)
+                if success_count >= count:
+                    break
 
