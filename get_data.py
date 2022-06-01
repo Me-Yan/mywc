@@ -181,18 +181,21 @@ class GetData:
         flag_datetime = time.strptime(flag_datetime_str, "%Y-%m-%d %H:%M:%S.%f")
         now_datetime = time.strptime(now_str, "%Y-%m-%d %H:%M:%S.%f")
 
-        if int(time.mktime(now_datetime)) <= int(time.mktime(flag_datetime)):
+        now_micro = int(time.mktime(now_datetime))
+        flag_micro = int(time.mktime(flag_datetime))
+        print("now_micro=%s, flag_micro=%s" % (now_micro, flag_micro))
+        if now_micro <= flag_micro:
             sid = 1
             index_list = [0, 5]
-            begin_datetime = "%s 14:00:00.000000" % now_date
+            begin_datetime = "%s 10:30:00.000000" % now_date
         else:
             sid = 9
             index_list = [0, 1]
-            begin_datetime = "%s 10:30:00.000000" % now_date
+            begin_datetime = "%s 14:00:00.000000" % now_date
 
         period_list = [sid]
 
-        print("now_str:%s, flag_datetime_str:%s, begin_datetime:%s, sid:%d" %(now_str, flag_datetime_str, begin_datetime, sid))
+        print("now_str=%s, flag_datetime_str=%s, begin_datetime=%s, sid=%d" %(now_str, flag_datetime_str, begin_datetime, sid))
 
         goods_list = self.get_all_data(period_list, index_list)
 
@@ -200,7 +203,11 @@ class GetData:
         success_count = 0
         if goods_list:
             while True:
-                print("now:%s" % datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"))
+                print("---------request_time:%s" % datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"))
+
+                # cur_micro = int(time.mktime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f"))
+                # begin_micro = int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f"))) + 1
+
                 if int(round(time.time() * 1000000)) >= (int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f")))* 1000000+int(1000000*delay_seconds)):
                     print(goods_list)
                     for item in goods_list:
@@ -208,18 +215,26 @@ class GetData:
                         cid = item['cid']
                         sid = item['sid']
                         mode = int(item['state'])
-                        price = round(float(price) / 100, 2)
+                        price = round(float(item["price"]) / 100, 2)
 
                         if price>=price_period[0] and price<=price_period[1]:
+                            request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
                             res_data = self.submit_order(gid=gid, cid=cid, sid=sid, mode=mode)
-                            if res_data["res_code"] == 1 and res_data["msg"] == "抢购成功，请尽快支付!":
+
+                            response_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
+                            if res_data["res_code"] == 1 or res_data["msg"] == "抢购成功，请尽快支付!":
                                 success_count += 1
+
+                            visit_count += 1
+
+                            print("visit_count=%d, ,success_count=%d, ,request_time=%s, ,response_time=%s, ,response=(%d, %s)"
+                                  % (visit_count, success_count, request_time, response_time, res_data["res_code"], res_data["msg"]))
 
                         if success_count >= count:
                             break
 
-                        visit_count += 1
-                        print(count)
                 if success_count >= count:
                     break
 
