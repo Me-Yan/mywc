@@ -165,7 +165,9 @@ class GetData:
 
         res = self.session.post(url=req_url, json=req_data, headers=self.basic_json["basic_header"])
 
-        return res.json()
+        res_json = res.json()
+
+        return res_json
 
     def visit_all_goods(self, count, price_period, delay_seconds):
         """
@@ -208,7 +210,10 @@ class GetData:
                 # cur_micro = int(time.mktime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f"))
                 # begin_micro = int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f"))) + 1
 
-                if int(round(time.time() * 1000000)) >= (int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f")))* 1000000+int(1000000*delay_seconds)):
+                cur_micro = int(round(time.time() * 1000000))
+                begin_micro = int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f")))* 1000000+int(1000000*delay_seconds)
+
+                if cur_micro >= begin_micro:
                     print(goods_list)
                     for item in goods_list:
                         gid = item['gid']
