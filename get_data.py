@@ -2,6 +2,7 @@ import json
 import time
 from datetime import datetime
 import requests
+from util import Util as util
 
 
 class GetData:
@@ -176,24 +177,26 @@ class GetData:
         :return:
         """
 
+        datetime_pattern = "%Y-%m-%d %H:%M:%S.%f"
+
         now = datetime.now()
-        now_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")
+        now_str = now.strftime(datetime_pattern)
         now_date = now.strftime("%Y-%m-%d")
 
         flag_datetime_str = "%s 12:00:00.000000" % now_date
-        flag_datetime = time.strptime(flag_datetime_str, "%Y-%m-%d %H:%M:%S.%f")
-        now_datetime = time.strptime(now_str, "%Y-%m-%d %H:%M:%S.%f")
+        flag_datetime = time.strptime(flag_datetime_str, datetime_pattern)
+        now_datetime = time.strptime(now_str, datetime_pattern)
 
         now_micro = int(time.mktime(now_datetime))
         flag_micro = int(time.mktime(flag_datetime))
-        print("now_micro=%s, flag_micro=%s" % (now_micro, flag_micro))
+
         if now_micro <= flag_micro:
             sid = 1
-            index_list = [0, 5]
+            index_list = list(range(0, 7))
             begin_datetime = "%s 10:30:00.000000" % now_date
         else:
             sid = 9
-            index_list = [0, 1]
+            index_list = list(range(0, 2))
             begin_datetime = "%s 14:00:00.000000" % now_date
 
         period_list = [sid]
@@ -201,20 +204,18 @@ class GetData:
         print("now_str=%s, flag_datetime_str=%s, begin_datetime=%s, sid=%d" %(now_str, flag_datetime_str, begin_datetime, sid))
 
         goods_list = self.get_all_data(period_list, index_list)
+        goods_list = sorted(goods_list, key=lambda x:int(x['price']), reverse=True)
 
         visit_count = 0
         success_count = 0
         if goods_list:
             while True:
-                print("---------request_time:%s" % datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"))
+                print("---------request_time:%s" % datetime.now().strftime(datetime_pattern))
 
-                # cur_micro = int(time.mktime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f"))
-                # begin_micro = int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f"))) + 1
+                cur_milli = int(round(time.time() * 1000))
+                begin_milli = int(util.get_millisecond(begin_datetime, datetime_pattern)) + int(1000 * delay_seconds)
 
-                cur_micro = int(round(time.time() * 1000000))
-                begin_micro = int(time.mktime(time.strptime(begin_datetime, "%Y-%m-%d %H:%M:%S.%f")))* 1000000+int(1000000*delay_seconds)
-
-                if cur_micro >= begin_micro:
+                if cur_milli >= begin_milli:
                     print(goods_list)
                     for item in goods_list:
                         gid = item['gid']
@@ -224,19 +225,19 @@ class GetData:
                         price = round(float(item["price"]) / 100, 2)
 
                         if price>=price_period[0] and price<=price_period[1]:
-                            request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+                            request_time = datetime.now().strftime(datetime_pattern)
 
                             res_data = self.submit_order(gid=gid, cid=cid, sid=sid, mode=mode)
 
-                            response_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+                            response_time = datetime.now().strftime(datetime_pattern)
 
                             if res_data["res_code"] == 1 or res_data["msg"] == "抢购成功，请尽快支付!":
                                 success_count += 1
 
                             visit_count += 1
 
-                            print("visit_count=%d, ,success_count=%d, ,request_time=%s, ,response_time=%s, ,response=(%d, %s)"
-                                  % (visit_count, success_count, request_time, response_time, res_data["res_code"], res_data["msg"]))
+                            print("visit_count=%d, ,success_count=%d, ,%.2f, ,request_time=%s, ,response_time=%s, ,response=(%d, %s)"
+                                  % (visit_count, success_count, price, request_time, response_time, res_data["res_code"], res_data["msg"]))
 
                         if success_count >= count:
                             break
