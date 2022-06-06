@@ -4,8 +4,6 @@ from database import Database
 
 if __name__ == "__main__":
 
-    # 帅娃: 15928446489    75337511
-
     flag = 2    # 1:表示查询商品  2:表示抢购
 
     gt = GetData()
