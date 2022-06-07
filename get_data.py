@@ -106,7 +106,7 @@ class GetData:
         """
 
         if goods_Data:
-            sql = "INSERT INTO goods (gid, cid, sid, mode, period, name, price, belong, nickname, update_time) VALUES"
+            sql = "INSERT INTO goods (gid, cid, sid, mode, period, name, price, code, belong, nickname, update_time) VALUES"
 
             for item in goods_Data:
                 gid = item['gid']
@@ -119,11 +119,12 @@ class GetData:
                 name = item['name']
                 price = item['price']
                 price = round(float(price) / 100, 2)
+                code = item['code']
                 belong = item['belong']
                 nickname = item['belong_nickname'] if "belong_nickname" in item else ""
                 update_time = item['update_time']
 
-                item_sql = "(%d, %d, %d, %d, '%s', '%s', %.2f, %d, '%s', '%s')," % (gid, cid, sid, mode, period, name, price, belong, nickname, update_time)
+                item_sql = "(%d, %d, %d, %d, '%s', '%s', %.2f, '%s', %d, '%s', '%s')," % (gid, cid, sid, mode, period, name, price, code, belong, nickname, update_time)
                 sql = "%s%s" % (sql, item_sql)
 
             sql = "%s;" % sql.rstrip(',')
@@ -248,6 +249,6 @@ class GetData:
         else:
             sid = 9
             index_list = list(range(0, 2))
-            begin_datetime = "%s 12:00:00.000000" % now_date
+            begin_datetime = "%s 14:00:00.000000" % now_date
 
         return sid, index_list, begin_datetime

@@ -4,7 +4,7 @@ from database import Database
 
 if __name__ == "__main__":
 
-    flag = 2    # 1:表示查询商品  2:表示抢购
+    flag = 1    # 1:表示查询商品  2:表示抢购
 
     gt = GetData()
     db = Database()
@@ -12,7 +12,7 @@ if __name__ == "__main__":
     gt.login()
 
     if flag == 1:
-        goods_list = gt.get_all_data([1, 9], list(range(0, 5)))
+        goods_list = gt.get_all_data([1, 9], list(range(0, 7)))
         sql = gt.process_data(goods_list)
         db.insert_goods_data(sql=sql)
     elif flag == 2:
