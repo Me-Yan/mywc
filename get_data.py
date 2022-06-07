@@ -7,6 +7,8 @@ from util import Util as util
 
 class GetData:
 
+    datetime_pattern = "%Y-%m-%d %H:%M:%S.%f"
+
     def __init__(self):
         with open("data.json", "r", encoding="utf-8") as data_file:
             self.basic_json = json.load(data_file)
@@ -130,27 +132,11 @@ class GetData:
 
         return None
 
-    def get_user_gtime(self, sid):
-        """
-        查看用户访问的时间
-        :return:
-        """
-        req_url = "%s%s" % (self.basic_json["basic_path"], self.basic_json["urls"]["time_url"])
-
-        req_data = {
-            "sid": sid,
-            "token": "%s" % self.token
-        }
-
-        res = self.session.post(url=req_url, json=req_data, headers=self.basic_json["basic_header"])
-        print(res.json())
-
     def submit_order(self, gid, cid, sid, mode):
         """
         提交订单
         :param gid:
         :param cid:
-        :param sid:
         :param mode:
         :return:
         """
@@ -171,37 +157,34 @@ class GetData:
 
         return res_json
 
+    def get_user_gtime(self):
+        """
+        查看用户访问的时间
+        :return:
+        """
+        req_url = "%s%s" % (self.basic_json["basic_path"], self.basic_json["urls"]["time_url"])
+
+        sid, index_list, begin_datetime = GetData.common_util()
+
+        req_data = {
+            "sid": sid,
+            "token": "%s" % self.token
+        }
+
+        res = self.session.post(url=req_url, json=req_data, headers=self.basic_json["basic_header"])
+        print(res.json())
+
     def visit_all_goods(self, count, price_period, delay_seconds):
         """
         轮询所有商品
         :return:
         """
 
-        datetime_pattern = "%Y-%m-%d %H:%M:%S.%f"
-
-        now = datetime.now()
-        now_str = now.strftime(datetime_pattern)
-        now_date = now.strftime("%Y-%m-%d")
-
-        flag_datetime_str = "%s 12:00:00.000000" % now_date
-        flag_datetime = time.strptime(flag_datetime_str, datetime_pattern)
-        now_datetime = time.strptime(now_str, datetime_pattern)
-
-        now_micro = int(time.mktime(now_datetime))
-        flag_micro = int(time.mktime(flag_datetime))
-
-        if now_micro <= flag_micro:
-            sid = 1
-            index_list = list(range(0, 7))
-            begin_datetime = "%s 10:30:00.000000" % now_date
-        else:
-            sid = 9
-            index_list = list(range(0, 2))
-            begin_datetime = "%s 14:00:00.000000" % now_date
+        sid, index_list, begin_datetime = GetData.common_util()
 
         period_list = [sid]
 
-        print("now_str=%s, flag_datetime_str=%s, begin_datetime=%s, sid=%d" %(now_str, flag_datetime_str, begin_datetime, sid))
+        print("begin_datetime=%s, sid=%d" %(begin_datetime, sid))
 
         goods_list = self.get_all_data(period_list, index_list)
         goods_list = sorted(goods_list, key=lambda x:int(x['price']), reverse=True)
@@ -210,26 +193,26 @@ class GetData:
         success_count = 0
         if goods_list:
             while True:
-                print("---------request_time:%s" % datetime.now().strftime(datetime_pattern))
+                print("---------request_time:%s" % datetime.now().strftime(GetData.datetime_pattern))
 
                 cur_milli = int(round(time.time() * 1000))
-                begin_milli = int(util.get_millisecond(begin_datetime, datetime_pattern)) + int(1000 * delay_seconds)
+                begin_milli = int(util.get_millisecond(begin_datetime, GetData.datetime_pattern)) + int(1000 * delay_seconds)
 
                 if cur_milli >= begin_milli:
                     print(goods_list)
                     for item in goods_list:
                         gid = item['gid']
                         cid = item['cid']
-                        sid = item['sid']
+                        temp_sid = item['sid']
                         mode = int(item['state'])
                         price = round(float(item["price"]) / 100, 2)
 
                         if price>=price_period[0] and price<=price_period[1]:
-                            request_time = datetime.now().strftime(datetime_pattern)
+                            request_time = datetime.now().strftime(GetData.datetime_pattern)
 
-                            res_data = self.submit_order(gid=gid, cid=cid, sid=sid, mode=mode)
+                            res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
 
-                            response_time = datetime.now().strftime(datetime_pattern)
+                            response_time = datetime.now().strftime(GetData.datetime_pattern)
 
                             if res_data["res_code"] == 1 or res_data["msg"] == "抢购成功，请尽快支付!":
                                 success_count += 1
@@ -245,3 +228,26 @@ class GetData:
                 if success_count >= count:
                     break
 
+    @staticmethod
+    def common_util():
+        now = datetime.now()
+        now_str = now.strftime(GetData.datetime_pattern)
+        now_date = now.strftime("%Y-%m-%d")
+
+        flag_datetime_str = "%s 12:00:00.000000" % now_date
+        flag_datetime = time.strptime(flag_datetime_str, GetData.datetime_pattern)
+        now_datetime = time.strptime(now_str, GetData.datetime_pattern)
+
+        now_micro = int(time.mktime(now_datetime))
+        flag_micro = int(time.mktime(flag_datetime))
+
+        if now_micro <= flag_micro:
+            sid = 1
+            index_list = list(range(0, 7))
+            begin_datetime = "%s 10:30:00.000000" % now_date
+        else:
+            sid = 9
+            index_list = list(range(0, 2))
+            begin_datetime = "%s 12:00:00.000000" % now_date
+
+        return sid, index_list, begin_datetime

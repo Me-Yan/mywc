@@ -16,7 +16,7 @@ if __name__ == "__main__":
         sql = gt.process_data(goods_list)
         db.insert_goods_data(sql=sql)
     elif flag == 2:
-        gt.get_user_gtime(1)
+        gt.get_user_gtime()
         gt.visit_all_goods(1, [0, 30000], 2)    # 抢几幅、价格区间、延迟几秒
 
 
