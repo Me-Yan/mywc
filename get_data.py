@@ -249,6 +249,6 @@ class GetData:
         else:
             sid = 9
             index_list = list(range(0, 2))
-            begin_datetime = "%s 14:00:00.000000" % now_date
+            begin_datetime = "%s 14:30:00.000000" % now_date
 
         return sid, index_list, begin_datetime
