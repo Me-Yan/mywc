@@ -19,6 +19,6 @@ if __name__ == "__main__":
         db.insert_goods_data(sql=sql)
     elif flag == 2:
         gt.get_user_gtime()
-        gt.visit_all_goods(1, [0, 30000], 1.5)    # 抢几幅、价格区间、延迟几秒
+        gt.visit_all_goods(1, [0, 20000], 1)    # 抢几幅、价格区间、延迟几秒
 
 
