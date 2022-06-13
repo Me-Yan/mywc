@@ -243,11 +243,11 @@ class GetData:
 
         if now_micro <= flag_micro:
             sid = 1
-            index_list = list(range(0, 7))
+            index_list = list(range(0, 8))
             begin_datetime = "%s 10:30:00.000000" % now_date
         else:
             sid = 9
-            index_list = list(range(0, 2))
+            index_list = list(range(0, 3))
             begin_datetime = "%s 14:30:00.000000" % now_date
 
         return sid, index_list, begin_datetime
