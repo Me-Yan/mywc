@@ -191,16 +191,23 @@ class GetData:
 
         visit_count = 0
         success_count = 0
+
+        flag = False
+
         if goods_list:
+            print(goods_list)
+
             while True:
-                print("---------request_time:%s" % datetime.now().strftime(GetData.datetime_pattern))
+                if not flag:
+                    cur_milli = int(round(time.time() * 1000))
+                    begin_milli = int(util.get_millisecond(begin_datetime, GetData.datetime_pattern)) + int(1000 * delay_seconds)
 
-                cur_milli = int(round(time.time() * 1000))
-                begin_milli = int(util.get_millisecond(begin_datetime, GetData.datetime_pattern)) + int(1000 * delay_seconds)
+                    if cur_milli >= begin_milli:
+                        flag = True
+                        print("---------request_time:%s" % datetime.now().strftime(GetData.datetime_pattern))
 
-                if cur_milli >= begin_milli:
-                    print(goods_list)
-                    for item in goods_list:
+                if flag:
+                    for item in goods_list[:]:
                         gid = item['gid']
                         cid = item['cid']
                         temp_sid = item['sid']
@@ -208,25 +215,35 @@ class GetData:
                         price = round(float(item["price"]) / 100, 2)
 
                         if price>=price_period[0] and price<=price_period[1]:
-                            request_time = datetime.now().strftime(GetData.datetime_pattern)
 
                             res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
 
-                            response_time = datetime.now().strftime(GetData.datetime_pattern)
-
-                            if res_data["res_code"] == 1 or res_data["msg"] == "抢购成功，请尽快支付!":
-                                success_count += 1
-
                             visit_count += 1
 
-                            print("visit_count=%d, ,success_count=%d, ,%.2f, ,request_time=%s, ,response_time=%s, ,response=(%d, %s)"
-                                  % (visit_count, success_count, price, request_time, response_time, res_data["res_code"], res_data["msg"]))
+                            if res_data["res_code"] == -1 and res_data["msg"] == "当日抢购数量已达上限!":
+                                goods_list.remove(item)
+                            elif res_data["res_code"] == -1 and res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
+                                goods_list.remove(item)
+                            elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
+                                success_count += 1
 
-                        if success_count >= count:
-                            break
+                                if success_count >= count:
+                                    success_time = datetime.now().strftime(GetData.datetime_pattern)
 
-                if success_count >= count:
-                    break
+                                    print("\nvisit_count=%d, ,success_count=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
+                                          % (visit_count, success_count, price, success_time, res_data["res_code"], res_data["msg"]))
+
+                                    break
+                        else:
+                            goods_list.remove(item)
+
+                    if success_count >= count:
+                        break
+
+                    if not goods_list:
+                        end_time = datetime.now().strftime(GetData.datetime_pattern)
+                        print("\n--------一个也没有抢到------------%s" % end_time)
+                        break
 
     @staticmethod
     def common_util():
