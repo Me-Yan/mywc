@@ -227,22 +227,25 @@ class GetData:
 
                             visit_count += 1
 
-                            if res_data["res_code"] == -1 and res_data["msg"] == "当日抢购数量已达上限!":
-                                goods_list.remove(item)
-                            elif res_data["res_code"] == -1 and res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
-                                goods_list.remove(item)
+                            if res_data["res_code"] == -1:
+                                if res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
+                                    goods_list.remove(item)
+                                elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
+                                    pass
+                                else:
+                                    print("---------response=%s : %s" % (res_data["res_code"], res_data["msg"]))
+
                             elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
                                 success_count += 1
 
                                 if success_count >= count:
                                     success_time = datetime.now().strftime(GetData.datetime_pattern)
 
-                                    print("\nvisit_count=%d, ,success_count=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
-                                          % (visit_count, success_count, price, success_time, res_data["res_code"], res_data["msg"]))
+                                    print("\nvisit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
+                                          % (visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
 
                                     break
-                            else:
-                                print("---------response=%s : %s" % (res_data["res_code"], res_data["msg"]))
+
                         else:
                             goods_list.remove(item)
 
