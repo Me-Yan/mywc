@@ -191,6 +191,7 @@ class GetData:
 
         visit_count = 0
         success_count = 0
+        circle_count = 0
 
         flag = False
 
@@ -210,6 +211,9 @@ class GetData:
                         print("---------开始抢购了,请等待结果........")
 
                 if flag:
+                    circle_count += 1
+                    print("-------------第%d回合--------------------" % circle_count)
+
                     for item in goods_list[:]:
                         gid = item['gid']
                         cid = item['cid']
@@ -266,7 +270,7 @@ class GetData:
         if now_micro <= flag_micro:
             sid = 1
             index_list = list(range(0, 8))
-            begin_datetime = "%s 10:30:00.000000" % now_date
+            begin_datetime = "%s 00:30:00.000000" % now_date
         else:
             sid = 9
             index_list = list(range(0, 3))
