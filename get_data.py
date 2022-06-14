@@ -198,13 +198,16 @@ class GetData:
             print(goods_list)
 
             while True:
+
                 if not flag:
+                    print("---------begin_time:%s" % datetime.now().strftime(GetData.datetime_pattern))
+
                     cur_milli = int(round(time.time() * 1000))
                     begin_milli = int(util.get_millisecond(begin_datetime, GetData.datetime_pattern)) + int(1000 * delay_seconds)
 
                     if cur_milli >= begin_milli:
                         flag = True
-                        print("---------request_time:%s" % datetime.now().strftime(GetData.datetime_pattern))
+                        print("---------开始抢购了,请等待结果........")
 
                 if flag:
                     for item in goods_list[:]:
@@ -234,6 +237,8 @@ class GetData:
                                           % (visit_count, success_count, price, success_time, res_data["res_code"], res_data["msg"]))
 
                                     break
+                            else:
+                                print("---------response=%s : %s" % (res_data["res_code"], res_data["msg"]))
                         else:
                             goods_list.remove(item)
 

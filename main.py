@@ -6,7 +6,7 @@ from database import Database
 """
 if __name__ == "__main__":
 
-    flag = 1    # 1:表示查询商品  2:表示抢购
+    flag = 2    # 1:表示查询商品  2:表示抢购
 
     gt = GetData()
     db = Database()
@@ -19,6 +19,6 @@ if __name__ == "__main__":
         db.insert_goods_data(sql=sql)
     elif flag == 2:
         gt.get_user_gtime()
-        gt.visit_all_goods(1, [0, 30000], 0.8)    # 抢几幅、价格区间、延迟几秒
+        gt.visit_all_goods(1, [0, 30000], 0)    # 抢几幅、价格区间、延迟几秒
 
 
