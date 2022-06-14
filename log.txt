@@ -7,6 +7,8 @@
 87
 {'res_code': -1, 'msg': '当日抢购数量已达上限!'}
 
+{'res_code': -1, 'msg': '很遗憾,您没有抢到'}
+
 
 request param:
 POST /web/common/setData
