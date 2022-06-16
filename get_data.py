@@ -228,8 +228,10 @@ class GetData:
                             visit_count += 1
 
                             if res_data["res_code"] == -1:
-                                if res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
-                                    goods_list.remove(item)
+                                if res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!"\
+                                        or res_data["msg"] == "很遗憾,您没有抢到":
+                                    pass
+                                    # goods_list.remove(item)
                                 elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
                                     pass
                                 else:
@@ -273,7 +275,7 @@ class GetData:
         if now_micro <= flag_micro:
             sid = 1
             index_list = list(range(0, 8))
-            begin_datetime = "%s 00:30:00.000000" % now_date
+            begin_datetime = "%s 10:30:00.000000" % now_date
         else:
             sid = 9
             index_list = list(range(0, 3))
