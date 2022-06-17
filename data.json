@@ -9,6 +9,7 @@
   "urls": {
     "login_url": "/web/user/login",
     "goods_url": "/web/rush/getRushGoods",
+    "join_url": "/web/common/setData",
     "time_url": "/web/rush/getUserGTime",
     "submit_url": "/web/rush/shoot"
   }

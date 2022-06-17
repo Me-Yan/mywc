@@ -157,7 +157,28 @@ class GetData:
 
         return res_json
 
-    def get_user_gtime(self):
+    def join_buy(self):
+        """
+        参与场次
+        :param sid:
+        :return:
+        """
+
+        sid, index_list, begin_datetime = GetData.common_util()
+
+        req_url = "%s%s" % (self.basic_json["basic_path"], self.basic_json["urls"]["join_url"])
+
+        req_data = {
+            "type": "进入场次",
+            "sid": sid,
+            "token": "%s" % self.token
+        }
+
+        res = self.session.post(url=req_url, json=req_data, headers=self.basic_json["basic_header"])
+        print(res.json())
+
+
+    def get_user_gtime(self, sid):
         """
         查看用户访问的时间
         :return:
@@ -274,7 +295,7 @@ class GetData:
 
         if now_micro <= flag_micro:
             sid = 1
-            index_list = list(range(0, 8))
+            index_list = list(range(0, 11))
             begin_datetime = "%s 10:30:00.000000" % now_date
         else:
             sid = 9
