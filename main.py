@@ -1,24 +1,60 @@
-from get_data import GetData
-from database import Database
 
 """
 --------Amos
 """
+import threading
+from util import Util
+from execute_code import ExecuteCode
+
+
 if __name__ == "__main__":
+    """
+    上午场时间、下午场时间、参考时间
+    入场
+    查询、参与、抢购
+    抢几幅、价格区间、延迟时间(秒)
+    """
 
-    flag = 0    # 0:表示入场   1:表示查询商品  2:表示抢购
+    base_data = Util.build_base_data()
 
-    gt = GetData()
-    db = Database()
+    threading.Thread(target=ExecuteCode.execute_code, name="Amos",
+                     args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()  # Amos
 
-    gt.login()
+    # threading.Thread(target=ExecuteCode.execute_code, name="双林",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()  # 双林
+    #
+    # threading.Thread(target=ExecuteCode.execute_code, name="帅娃",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start() # 帅娃
+    #
+    # threading.Thread(target=ExecuteCode.execute_code, name="老郑",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()   # 老郑
 
-    if flag == 0:
-        gt.join_buy()
-    elif flag == 1:
-        goods_list = gt.get_all_data([1, 9], list(range(0, 11)))
-        sql = gt.process_data(goods_list)
-        db.insert_goods_data(sql=sql)
-    elif flag == 2:
-        gt.get_user_gtime()
-        gt.visit_all_goods(1, [0, 11000], 0)    # 抢几幅、价格区间、延迟几秒
+    # threading.Thread(target=ExecuteCode.execute_code, name="包子",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()  # 包子
+    #
+    # threading.Thread(target=ExecuteCode.execute_code, name="贾哥",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()    # 贾哥
+    #
+    # threading.Thread(target=ExecuteCode.execute_code, name="粉红",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()    # 粉红
+    #
+    # threading.Thread(target=ExecuteCode.execute_code, name="桂林",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start() # 桂林
+    #
+    # threading.Thread(target=ExecuteCode.execute_code, name="曲",
+    #                  args=(base_data, "xxxxx", "xxxxx", "抢购", 1, 0, 50000, 0)).start()  # 曲
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

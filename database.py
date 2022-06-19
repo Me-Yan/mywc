@@ -34,7 +34,7 @@ class Database:
         except Exception:
             db.rollback()
             print(traceback.print_exc())
-            print("插入记录失败。。。%s" % (sql))
+            print("-------插入记录失败。。。%s" % (sql))
 
         db.close()
 
@@ -50,7 +50,7 @@ class Database:
         except Exception:
             db.rollback()
             print(traceback.print_exc())
-            print("插入记录失败。。。%s" % (sql))
+            print("---------插入记录失败。。。%s" % (sql))
 
         db.close()
 
