@@ -27,7 +27,7 @@ class User:
         res_json = res.json()
 
         self.user_data = {
-            "token" : "%s" % res_json['data']['token'],
+            "token": "%s" % res_json['data']['token'],
             "address": "%s" % res_json["data"]["address_list"][0],
             "session": session
         }
