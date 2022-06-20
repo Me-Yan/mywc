@@ -250,35 +250,40 @@ class GoodsAction:
                         cid = item['cid']
                         temp_sid = item['sid']
                         mode = int(item['state'])
-                        price = round(float(item["price"]) / 100, 2)
 
-                        if self.min_price <= price <= self.max_price:
+                        # 1: 可抢 2：已被抢
+                        if mode == 1:
+                            price = round(float(item["price"]) / 100, 2)
 
-                            res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
+                            if self.min_price <= price <= self.max_price:
 
-                            visit_count += 1
+                                res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
 
-                            if res_data["res_code"] == -1:
-                                if res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!" \
-                                        or res_data["msg"] == "很遗憾,您没有抢到":
-                                    pass
-                                    goods_list.remove(item)
-                                elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
-                                    pass
-                                else:
-                                    print("------%s.......response=%s : %s" % (thread_name, res_data["res_code"], res_data["msg"]))
-                            elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
-                                success_count += 1
+                                visit_count += 1
 
-                                if success_count >= self.count:
-                                    success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
+                                if res_data["res_code"] == -1:
+                                    if res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!" \
+                                            or res_data["msg"] == "很遗憾,您没有抢到":
+                                        pass
+                                        goods_list.remove(item)
+                                    elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
+                                        pass
+                                    else:
+                                        print("------%s.......response=%s : %s" % (thread_name, res_data["res_code"], res_data["msg"]))
+                                elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
+                                    success_count += 1
 
-                                    print("\n------%s......恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
-                                        % (thread_name, visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
+                                    if success_count >= self.count:
+                                        success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
 
-                                    break
+                                        print("\n------%s......恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
+                                            % (thread_name, visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
 
-                        else:
+                                        break
+
+                            else:
+                                goods_list.remove(item)
+                        elif mode == 2:
                             goods_list.remove(item)
 
                     end_milli = int(round(time.time() * 1000))
