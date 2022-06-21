@@ -193,7 +193,7 @@ class GoodsAction:
             "gid": gid,
             "cid": cid,
             "sid": sid,
-            "mode": "%d" % mode,
+            "mode": "1",
             "token": "%s" % self.token,
             "address_info": "%s" % self.address_info
         }
@@ -259,13 +259,16 @@ class GoodsAction:
 
                                 res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
 
+                                print("------%s.......response=%s : %s" % (
+                                thread_name, res_data["res_code"], res_data["msg"]))
+
                                 visit_count += 1
 
                                 if res_data["res_code"] == -1:
                                     if res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!" \
                                             or res_data["msg"] == "很遗憾,您没有抢到":
                                         pass
-                                        goods_list.remove(item)
+                                        # goods_list.remove(item)
                                     elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
                                         pass
                                     else:
