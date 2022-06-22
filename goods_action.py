@@ -259,9 +259,6 @@ class GoodsAction:
 
                                 res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
 
-                                print("------%s.......response=%s : %s" % (
-                                thread_name, res_data["res_code"], res_data["msg"]))
-
                                 visit_count += 1
 
                                 if res_data["res_code"] == -1:
