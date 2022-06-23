@@ -252,7 +252,7 @@ class GoodsAction:
                         mode = int(item['state'])
 
                         # 1: 可抢 2：已被抢
-                        if mode == 2 or again is True:
+                        if mode == 1 or again is True:
                             price = round(float(item["price"]) / 100, 2)
 
                             if self.min_price <= price <= self.max_price:
