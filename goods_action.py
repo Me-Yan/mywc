@@ -204,7 +204,7 @@ class GoodsAction:
 
         return res_json
 
-    def loop_submit(self):
+    def loop_submit(self, again):
         """轮询抢购所有商品"""
 
         current_thread = threading.current_thread()
@@ -252,7 +252,7 @@ class GoodsAction:
                         mode = int(item['state'])
 
                         # 1: 可抢 2：已被抢
-                        if mode == 1:
+                        if mode == 2 or again is True:
                             price = round(float(item["price"]) / 100, 2)
 
                             if self.min_price <= price <= self.max_price:

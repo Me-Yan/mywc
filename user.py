@@ -39,7 +39,7 @@ class User:
 
         return self
 
-    def buy_goods(self, action="抢购", count=1, min_price=0, max_price=50000, delay_seconds=0):
+    def buy_goods(self, action="抢购", count=1, min_price=0, max_price=50000, delay_seconds=0, again=False):
         """用户购买商品"""
 
         order_action = GoodsAction(base_data=self.base_data, action=action, count=count, min_price=min_price, max_price=max_price, delay_seconds=delay_seconds)
@@ -60,6 +60,6 @@ class User:
         elif action == "抢购":
             order_action.join_buy()
             order_action.get_user_gtime()
-            order_action.loop_submit()
+            order_action.loop_submit(again)
 
 
