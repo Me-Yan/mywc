@@ -276,8 +276,8 @@ class GoodsAction:
                                     if success_count >= self.count:
                                         success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
 
-                                        print("\n------%s......恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
-                                            % (thread_name, visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
+                                        print("\n------%s......%s.....恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
+                                            % (thread_name, self.base_data["user_data"]["nickname"], visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
 
                                         break
 
