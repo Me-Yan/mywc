@@ -263,7 +263,8 @@ class GoodsAction:
 
                                 if res_data["res_code"] == -1:
                                     if res_data["msg"] == "很遗憾,您没有抢到":
-                                        goods_list.remove(item)
+                                        if again is False:
+                                            goods_list.remove(item)
                                     elif res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
                                         pass
                                     elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
@@ -277,7 +278,7 @@ class GoodsAction:
                                         success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
 
                                         print("\n------%s......%s.....恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
-                                            % (thread_name, self.base_data["user_data"]["nickname"], visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
+                                            % (thread_name, self.user_data["nickname"], visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
 
                                         break
 
