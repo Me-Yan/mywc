@@ -21,6 +21,7 @@ class GoodsAction:
         self.token = base_data["user_data"]["token"]
         self.address_info = base_data["user_data"]
         self.session = base_data["user_data"]["session"]
+        self.nickname = base_data["user_data"]["nickname"]
 
         self.activity_data = base_data["activity_data"]
         self.list_sid = base_data["activity_data"]["list_sid"]
@@ -161,9 +162,9 @@ class GoodsAction:
         thread_name = current_thread.getName()
 
         if res_json["res_code"] == 1:
-            print("------%s......进入场次..成功---" % thread_name)
+            print("------%s....%s..进入场次..成功---" % (thread_name, self.nickname))
         else:
-            print("------%s......进入场次..失败失败失败---" % thread_name)
+            print("------%s....%s..进入场次..失败失败失败---" % (thread_name, self.nickname))
 
     def get_user_gtime(self):
         """获取用户访问的时间"""
@@ -180,9 +181,9 @@ class GoodsAction:
         res_json = res.json()
 
         if res_json["res_code"] == 1:
-            print("------%s......触发时间判断..成功---" % threading.current_thread().getName())
+            print("------%s....%s..触发时间判断..成功---" % (threading.current_thread().getName(), self.nickname))
         else:
-            print("------%s......触发时间判断..成功---" % threading.current_thread().getName())
+            print("------%s....%s..触发时间判断..成功---" % (threading.current_thread().getName(), self.nickname))
 
     def submit_order(self, gid, cid, sid, mode):
         """抢购商品"""
@@ -209,7 +210,6 @@ class GoodsAction:
 
         current_thread = threading.current_thread()
         thread_name = current_thread.getName()
-        nickname = self.user_data["nickname"]
 
         begin_datetime_str = Util.get_start_datetime_str(self.flag_time, self.morning_time, self.afternoon_time)
 
@@ -231,19 +231,19 @@ class GoodsAction:
                 new_goods_list = goods_list[:]
 
                 if not flag:
-                    print("------%s....%s..当前时间:%s" % (thread_name, nickname, datetime.now().strftime(GoodsAction.default_pattern)))
+                    print("------%s....%s..当前时间:%s" % (thread_name, self.nickname, datetime.now().strftime(GoodsAction.default_pattern)))
 
                     cur_milli = int(round(time.time() * 1000))
                     begin_milli = int(Util.get_millisecond(begin_datetime_str, Util.YYYY_MM_DD_HH_MM_SS_FF)) + int(1000 * self.delay_seconds)
 
                     if cur_milli >= begin_milli:
                         flag = True
-                        print("------%s....%s..开始抢购了,请等待结果........" % (thread_name, nickname))
+                        print("------%s....%s..开始抢购了,请等待结果........" % (thread_name, self.nickname))
 
                 if flag:
                     circle_count += 1
                     start_milli = int(round(time.time() * 1000))
-                    print("------%s....%s..第%d回合--------------------" % (thread_name, nickname, circle_count))
+                    print("------%s....%s..第%d回合--------------------" % (thread_name, self.nickname, circle_count))
 
                     # 如果能够获取到商品的状态，需要将这个商品list更换成切片的形式
                     for item in new_goods_list:
@@ -271,7 +271,7 @@ class GoodsAction:
                                     elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
                                         pass
                                     else:
-                                        print("------%s.......response=%s : %s" % (thread_name, res_data["res_code"], res_data["msg"]))
+                                        print("------%s....%s...response=%s : %s" % (thread_name, self.nickname, res_data["res_code"], res_data["msg"]))
                                 elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
                                     success_count += 1
 
@@ -279,7 +279,7 @@ class GoodsAction:
                                         success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
 
                                         print("\n------%s......%s.....恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
-                                            % (thread_name, self.user_data["nickname"], visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
+                                            % (thread_name, self.nickname, visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
 
                                         break
 
@@ -290,14 +290,14 @@ class GoodsAction:
 
                     end_milli = int(round(time.time() * 1000))
 
-                    print("------%s....%s..第%d回合用时:%d......------------" % (thread_name, nickname, circle_count, int(end_milli-start_milli)))
+                    print("------%s....%s..第%d回合用时:%d......------------" % (thread_name, self.nickname, circle_count, int(end_milli-start_milli)))
 
                     if success_count >= self.count:
                         break
 
                     if not goods_list:
                         end_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
-                        print("\n------%s....%s..一个也没有抢到------------%s" % (thread_name, nickname, end_time))
+                        print("\n------%s....%s..一个也没有抢到------------%s" % (thread_name, self.nickname, end_time))
                         break
 
         self.session.close()
