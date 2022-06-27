@@ -209,6 +209,7 @@ class GoodsAction:
 
         current_thread = threading.current_thread()
         thread_name = current_thread.getName()
+        nickname = self.user_data["nickname"]
 
         begin_datetime_str = Util.get_start_datetime_str(self.flag_time, self.morning_time, self.afternoon_time)
 
@@ -230,19 +231,19 @@ class GoodsAction:
                 new_goods_list = goods_list[:]
 
                 if not flag:
-                    print("------%s......当前时间:%s" % (thread_name, datetime.now().strftime(GoodsAction.default_pattern)))
+                    print("------%s....%s..当前时间:%s" % (thread_name, nickname, datetime.now().strftime(GoodsAction.default_pattern)))
 
                     cur_milli = int(round(time.time() * 1000))
                     begin_milli = int(Util.get_millisecond(begin_datetime_str, Util.YYYY_MM_DD_HH_MM_SS_FF)) + int(1000 * self.delay_seconds)
 
                     if cur_milli >= begin_milli:
                         flag = True
-                        print("------%s......开始抢购了,请等待结果........" % thread_name)
+                        print("------%s....%s..开始抢购了,请等待结果........" % (thread_name, nickname))
 
                 if flag:
                     circle_count += 1
                     start_milli = int(round(time.time() * 1000))
-                    print("------%s......第%d回合--------------------" % (thread_name, circle_count))
+                    print("------%s....%s..第%d回合--------------------" % (thread_name, nickname, circle_count))
 
                     # 如果能够获取到商品的状态，需要将这个商品list更换成切片的形式
                     for item in new_goods_list:
@@ -289,14 +290,14 @@ class GoodsAction:
 
                     end_milli = int(round(time.time() * 1000))
 
-                    print("------%s......第%d回合用时:%d......------------" % (thread_name, circle_count, int(end_milli-start_milli)))
+                    print("------%s....%s..第%d回合用时:%d......------------" % (thread_name, nickname, circle_count, int(end_milli-start_milli)))
 
                     if success_count >= self.count:
                         break
 
                     if not goods_list:
                         end_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
-                        print("\n------%s......一个也没有抢到------------%s" % (thread_name, end_time))
+                        print("\n------%s....%s..一个也没有抢到------------%s" % (thread_name, nickname, end_time))
                         break
 
         self.session.close()
