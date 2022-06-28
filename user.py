@@ -54,8 +54,9 @@ class User:
                 sql = order_action.build_sql(goods_list)
 
                 database = Database()
+                database.clear_goods("DELETE FROM goods")
                 database.insert_goods_data(sql)
-        elif action == "参与":
+        elif action == "入场":
             order_action.join_buy()
             order_action.get_user_gtime()
         elif action == "抢购":

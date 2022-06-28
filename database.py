@@ -54,5 +54,20 @@ class Database:
 
         db.close()
 
+    def clear_goods(self, sql):
+        db = self.create_db_connection()
+
+        cursor = db.cursor()
+
+        try:
+            cursor.execute(sql)
+            db.commit()
+        except Exception:
+            db.rollback()
+            print(traceback.print_exc())
+            print("---------删除记录失败。。。%s" % (sql))
+
+        db.close()
+
 
 
