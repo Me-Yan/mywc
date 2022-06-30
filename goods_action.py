@@ -113,7 +113,7 @@ class GoodsAction:
                 nickname = item['belong_nickname'] if "belong_nickname" in item else ""
                 update_time = item['update_time']
 
-                item_sql = "(%d, %d, %d, %d, '%s', '%s', %.2f, %d, '%s', '%s')," % (
+                item_sql = "(%d, %d, %d, %d, \"%s\", \"%s\", %.2f, %d, \"%s\", \"%s\")," % (
                 gid, cid, sid, mode, period, name, price, belong, nickname, update_time)
                 sql = "%s%s" % (sql, item_sql)
 
