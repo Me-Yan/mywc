@@ -96,7 +96,7 @@ class GoodsAction:
         """构建商品的sql"""
 
         if goods_list:
-            sql = "INSERT INTO goods (gid, cid, sid, mode, period, name, price, belong, nickname, update_time) VALUES"
+            sql = "INSERT INTO goods (gid, cid, sid, mode, period, name, price, belong, nickname, update_time, base_price, create_time) VALUES"
 
             for item in goods_list:
                 gid = item['gid']
@@ -107,14 +107,17 @@ class GoodsAction:
                 if sid == 9:
                     period = "下午"
                 name = item['name']
+                base_price = item['base_price']
+                base_price = round(float(base_price) / 100, 2)
                 price = item['price']
                 price = round(float(price) / 100, 2)
                 belong = item['belong']
                 nickname = item['belong_nickname'] if "belong_nickname" in item else ""
                 update_time = item['update_time']
+                create_time = item['create_time']
 
-                item_sql = "(%d, %d, %d, %d, \"%s\", \"%s\", %.2f, %d, \"%s\", \"%s\")," % (
-                gid, cid, sid, mode, period, name, price, belong, nickname, update_time)
+                item_sql = "(%d, %d, %d, %d, \"%s\", \"%s\", %.2f, %d, \"%s\", \"%s\", %.2f, \"%s\")," % (
+                gid, cid, sid, mode, period, name, price, belong, nickname, update_time, base_price, create_time)
                 sql = "%s%s" % (sql, item_sql)
 
             sql = "%s;" % sql.rstrip(',')
