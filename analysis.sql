@@ -1,6 +1,7 @@
-INSERT INTO goods_analysis(datetime,name,total_count,total_people,sum_price,single_people,single_price,more_people,more_price,single_price_rate,more_price_rate,name_morning,morning_count,morning_people,morning_price,single_people_morning,single_price_morning,more_people_morning,more_price_morning,single_price_rate_morning,more_price_rate_morning,name_afternoon,afternoon_count,afternoon_people,afternoon_price,single_people_afternoon,single_price_afternoon,more_people_afternoon,more_price_afternoon,single_price_rate_afternoon,more_price_rate_afternoon)
+INSERT INTO goods_analysis(datetime,max_user_id,name,total_count,total_people,sum_price,single_people,single_price,more_people,more_price,single_price_rate,more_price_rate,name_morning,morning_count,morning_people,morning_price,single_people_morning,single_price_morning,more_people_morning,more_price_morning,single_price_rate_morning,more_price_rate_morning,name_afternoon,afternoon_count,afternoon_people,afternoon_price,single_people_afternoon,single_price_afternoon,more_people_afternoon,more_price_afternoon,single_price_rate_afternoon,more_price_rate_afternoon)
 VALUES(
 CURRENT_DATE,
+(SELECT MAX(belong) FROM goods),
 "总盘", 
 (SELECT COUNT(1) FROM goods),
 (SELECT COUNT(1) FROM ( SELECT DISTINCT belong,nickname FROM goods) AS aa),
