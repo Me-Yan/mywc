@@ -4,6 +4,7 @@ import requests
 from goods_action import GoodsAction
 from database import Database
 
+
 class User:
 
     def __init__(self, phone, password, base_data):
@@ -56,6 +57,11 @@ class User:
                 database = Database()
                 database.clear_goods("DELETE FROM goods")
                 database.insert_goods_data(sql)
+
+                analysis_sql = order_action.analysis_data()
+                database = Database()
+                database.delete_today_analysis()
+                database.analysis_data(analysis_sql)
         elif action == "入场":
             order_action.join_buy()
             order_action.get_user_gtime()

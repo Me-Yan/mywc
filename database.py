@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 import pymysql
 import traceback
+from datetime import datetime
+
+from util import Util
 
 
 class Database:
@@ -69,5 +72,38 @@ class Database:
 
         db.close()
 
+    def delete_today_analysis(self):
+        today_date_str = datetime.now().strftime(Util.YYYY_MM_DD)
+
+        sql = "DELETE FROM goods_analysis WHERE datetime = '%s'" % today_date_str
+
+        db = self.create_db_connection()
+
+        cursor = db.cursor()
+
+        try:
+            cursor.execute(sql)
+            db.commit()
+        except Exception:
+            db.rollback()
+            print(traceback.print_exc())
+            print("---------删除记录失败。。。%s" % (sql))
+
+        db.close()
+
+    def analysis_data(self, sql):
+        db = self.create_db_connection()
+
+        cursor = db.cursor()
+
+        try:
+            cursor.execute(sql)
+            db.commit()
+        except Exception:
+            db.rollback()
+            print(traceback.print_exc())
+            print("---------分析数据失败。。。%s" % (sql))
+
+        db.close()
 
 
