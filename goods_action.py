@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from util import Util
 
+
 class GoodsAction:
 
     default_pattern = "%Y-%m-%d %H:%M:%S.%f"
@@ -82,8 +83,6 @@ class GoodsAction:
 
         if goods_list:
             goods_list = sorted(goods_list, key=lambda x: int(x['price']), reverse=True)
-
-        print(goods_list)
 
         if len(list_sid) == 1:
             print("------获取 %d 页数据，共 %d 个商品---------" % (count, len(goods_list)))
@@ -300,30 +299,32 @@ class GoodsAction:
 
                             if self.min_price <= price <= self.max_price:
 
-                                res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
+                                try:
+                                    visit_count += 1
+                                    res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
+                                except BaseException as e:
+                                    print(e)
+                                else:
+                                    if res_data["res_code"] == -1:
+                                        if res_data["msg"] == "很遗憾,您没有抢到":
+                                            if again is False:
+                                                goods_list.remove(item)
+                                        elif res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
+                                            pass
+                                        elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
+                                            pass
+                                        else:
+                                            print("------%s....%s...response=%s : %s" % (thread_name, self.nickname, res_data["res_code"], res_data["msg"]))
+                                    elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
+                                        success_count += 1
 
-                                visit_count += 1
+                                        if success_count >= self.count:
+                                            success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
 
-                                if res_data["res_code"] == -1:
-                                    if res_data["msg"] == "很遗憾,您没有抢到":
-                                        if again is False:
-                                            goods_list.remove(item)
-                                    elif res_data["msg"] == "当日抢购数量已达上限!" or res_data["msg"] == "优先抢购数量已用完，请等待正式抢购!":
-                                        pass
-                                    elif res_data["msg"] == "当前时间抢购失败!" or res_data["msg"] == "商品抢购失败":
-                                        pass
-                                    else:
-                                        print("------%s....%s...response=%s : %s" % (thread_name, self.nickname, res_data["res_code"], res_data["msg"]))
-                                elif res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
-                                    success_count += 1
+                                            print("\n------%s......%s.....恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,outcome=%s:%.2f, ,success_time=%s, ,response=(%d, %s)"
+                                                % (thread_name, self.nickname, visit_count, success_count, gid, thread_name, price, success_time, res_data["res_code"], res_data["msg"]))
 
-                                    if success_count >= self.count:
-                                        success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
-
-                                        print("\n------%s......%s.....恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,price=%.2f, ,success_time=%s, ,response=(%d, %s)"
-                                            % (thread_name, self.nickname, visit_count, success_count, gid, price, success_time, res_data["res_code"], res_data["msg"]))
-
-                                        break
+                                            break
 
                             else:
                                 goods_list.remove(item)
