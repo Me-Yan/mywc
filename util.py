@@ -22,7 +22,7 @@ class Util:
         return millisecond
 
     @staticmethod
-    def get_sid(flag_time):
+    def get_sid(flag_time, mor_sid, after_sid):
         """获取当前时间的sid"""
 
         now = datetime.now()
@@ -37,9 +37,9 @@ class Util:
         flag_micro = int(time.mktime(flag_datetime))
 
         if now_micro <= flag_micro:
-            sid = 1
+            sid = mor_sid
         else:
-            sid = 9
+            sid = after_sid
 
         return sid
 
@@ -74,7 +74,9 @@ class Util:
         with open("data.json", "r", encoding="utf-8") as data_file:
             base_data = json.load(data_file)
 
-        sid = Util.get_sid(base_data["time_data"]["flag_time"])
+        list_sid = base_data["activity_data"]["list_sid"]
+
+        sid = Util.get_sid(base_data["time_data"]["flag_time"], list_sid[0], list_sid[1])
 
         base_data["activity_data"]["current_sid"] = sid
 

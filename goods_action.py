@@ -178,6 +178,8 @@ class GoodsAction:
 
         res_json = res.json()
 
+        count = 0
+
         if res_json["data"]["list"]:
             count = res_json["data"]["total_count"]
 
