@@ -60,7 +60,7 @@ class User:
 
                 analysis_sql = order_action.analysis_data()
                 database = Database()
-                database.delete_today_analysis()
+                # database.delete_today_analysis()
                 database.analysis_data(analysis_sql)
         elif action == "入场":
             order_action.join_buy()
