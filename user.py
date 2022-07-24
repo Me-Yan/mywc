@@ -57,11 +57,26 @@ class User:
                 database = Database()
                 database.clear_goods("DELETE FROM goods")
                 database.insert_goods_data(sql)
+        elif action == "分析":
+            page_size = self.base_data["activity_data"]["page_size"]
 
-                analysis_sql = order_action.analysis_data()
-                database = Database()
-                # database.delete_today_analysis()
-                database.analysis_data(analysis_sql)
+            list_store = self.base_data["activity_data"]["list_store"]
+
+            for store in list_store:
+                mor_sid = store["list_sid"][0]
+                after_sid = store["list_sid"][1]
+                goods_list = order_action.list_all_goods(store["list_sid"], page_size)
+                if goods_list:
+                    sql = order_action.build_sql(goods_list)
+
+                    database = Database()
+                    database.clear_goods("DELETE FROM goods")
+                    database.insert_goods_data(sql)
+
+                    analysis_sql = order_action.analysis_data(store["store_name"], mor_sid, after_sid)
+                    database = Database()
+                    # database.delete_today_analysis()
+                    database.analysis_data(analysis_sql)
         elif action == "入场":
             order_action.join_buy()
             order_action.get_user_gtime()

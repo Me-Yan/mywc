@@ -123,12 +123,13 @@ class GoodsAction:
 
             return sql
 
-    def analysis_data(self):
+    def analysis_data(self, store_name, mor_sid, after_sid):
         """分析盘的数据"""
 
-        sql = 'INSERT INTO goods_analysis(datetime,max_user_id,name,total_count,total_people,sum_price,single_people,single_price,more_people,more_price,single_price_rate,more_price_rate,name_morning,morning_count,morning_people,morning_price,single_people_morning,single_price_morning,more_people_morning,more_price_morning,single_price_rate_morning,more_price_rate_morning,name_afternoon,afternoon_count,afternoon_people,afternoon_price,single_people_afternoon,single_price_afternoon,more_people_afternoon,more_price_afternoon,single_price_rate_afternoon,more_price_rate_afternoon)' \
+        sql = 'INSERT INTO goods_analysis(datetime,store_name,max_user_id,name,total_count,total_people,sum_price,single_people,single_price,more_people,more_price,single_price_rate,more_price_rate,name_morning,morning_count,morning_people,morning_price,single_people_morning,single_price_morning,more_people_morning,more_price_morning,single_price_rate_morning,more_price_rate_morning,name_afternoon,afternoon_count,afternoon_people,afternoon_price,single_people_afternoon,single_price_afternoon,more_people_afternoon,more_price_afternoon,single_price_rate_afternoon,more_price_rate_afternoon)' \
               'VALUES(CURRENT_DATE,' \
-              '(SELECT MAX(belong) FROM goods),'\
+              '"%s",' \
+              '(SELECT MAX(belong) FROM goods),' \
               '"总盘",' \
               '(SELECT COUNT(1) FROM goods),' \
               '(SELECT COUNT(1) FROM ( SELECT DISTINCT belong,nickname FROM goods) AS aa),' \
@@ -140,25 +141,28 @@ class GoodsAction:
               '(SELECT (SELECT SUM(price) FROM goods WHERE belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods GROUP BY belong having num < 2) AS ff))/(SELECT SUM( price) FROM goods))*100,' \
               '(SELECT (SELECT SUM(price) FROM goods WHERE belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods GROUP BY belong having num >= 2) AS gg))/(SELECT SUM( price) FROM goods))*100,' \
               '"上午场",' \
-              '(SELECT COUNT(1) FROM goods WHERE sid = 1),' \
-              '(SELECT COUNT(1) FROM ( SELECT DISTINCT belong,nickname FROM goods WHERE sid = 1) AS hh),' \
-              '(SELECT SUM(price) FROM goods WHERE sid = 1),' \
-              '(SELECT COUNT(*) FROM ( SELECT belong, nickname, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 1 GROUP BY belong having num < 2) AS ii),' \
-              '(SELECT SUM(price) FROM goods WHERE sid = 1 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 1 GROUP BY belong having num < 2) AS jj)),' \
-              '(SELECT COUNT(*) FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 1 GROUP BY belong having num >= 2) AS kk),' \
-              '(SELECT SUM(price) FROM goods WHERE sid = 1 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 1 GROUP BY belong having num >= 2) AS ll)),' \
-              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = 1 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 1 GROUP BY belong having num < 2) AS mm))/(SELECT SUM(price) FROM goods WHERE sid = 1))*100,' \
-              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = 1 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 1 GROUP BY belong having num >= 2) AS nn))/(SELECT SUM(price) FROM goods WHERE sid = 1))*100,' \
+              '(SELECT COUNT(1) FROM goods WHERE sid = %d),' \
+              '(SELECT COUNT(1) FROM ( SELECT DISTINCT belong,nickname FROM goods WHERE sid = %d) AS hh),' \
+              '(SELECT SUM(price) FROM goods WHERE sid = %d),' \
+              '(SELECT COUNT(*) FROM ( SELECT belong, nickname, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num < 2) AS ii),' \
+              '(SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num < 2) AS jj)),' \
+              '(SELECT COUNT(*) FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num >= 2) AS kk),' \
+              '(SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num >= 2) AS ll)),' \
+              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num < 2) AS mm))/(SELECT SUM(price) FROM goods WHERE sid = %d))*100,' \
+              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num >= 2) AS nn))/(SELECT SUM(price) FROM goods WHERE sid = %d))*100,' \
               '"下午场",' \
-              '(SELECT COUNT(1) FROM goods WHERE sid = 9),' \
-              '(SELECT COUNT(1) FROM ( SELECT DISTINCT belong,nickname FROM goods WHERE sid = 9) AS oo),' \
-              '(SELECT SUM(price) FROM goods WHERE sid = 9),' \
-              '(SELECT COUNT(*) FROM ( SELECT belong, nickname, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 9 GROUP BY belong having num < 2) AS pp),' \
-              '(SELECT SUM(price) FROM goods WHERE sid = 9 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 9 GROUP BY belong having num < 2) AS qq)),' \
-              '(SELECT COUNT(*) FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 9 GROUP BY belong having num >= 2) AS rr),' \
-              '(SELECT SUM(price) FROM goods WHERE sid = 9 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 9 GROUP BY belong having num >= 2) AS ss)),' \
-              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = 9 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 9 GROUP BY belong having num < 2) AS tt))/(SELECT SUM(price) FROM goods WHERE sid = 9))*100,' \
-              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = 9 AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = 9 GROUP BY belong having num >= 2) AS uu))/(SELECT SUM(price) FROM goods WHERE sid = 9))*100);'
+              '(SELECT COUNT(1) FROM goods WHERE sid = %d),' \
+              '(SELECT COUNT(1) FROM ( SELECT DISTINCT belong,nickname FROM goods WHERE sid = %d) AS oo),' \
+              '(SELECT SUM(price) FROM goods WHERE sid = %d),' \
+              '(SELECT COUNT(*) FROM ( SELECT belong, nickname, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num < 2) AS pp),' \
+              '(SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num < 2) AS qq)),' \
+              '(SELECT COUNT(*) FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num >= 2) AS rr),' \
+              '(SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num >= 2) AS ss)),' \
+              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num < 2) AS tt))/(SELECT SUM(price) FROM goods WHERE sid = %d))*100,' \
+              '(SELECT (SELECT SUM(price) FROM goods WHERE sid = %d AND belong in (SELECT belong FROM (SELECT belong, COUNT(*) AS num, price, create_time FROM goods WHERE sid = %d GROUP BY belong having num >= 2) AS uu))/(SELECT SUM(price) FROM goods WHERE sid = %d))*100);' % (
+              store_name, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid, mor_sid,
+              mor_sid, mor_sid, mor_sid, mor_sid, after_sid, after_sid, after_sid, after_sid, after_sid, after_sid,
+              after_sid, after_sid, after_sid, after_sid, after_sid, after_sid, after_sid, after_sid, after_sid)
 
         return sql
 

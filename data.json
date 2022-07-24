@@ -16,8 +16,15 @@
     }
   },
   "activity_data": {
-    "list_sid": [35, 36],
-    "page_size": 10
+    "list_sid": [21, 22],
+    "page_size": 10,
+    "list_store": [
+      {"store_name": "小月月", "list_sid": [21, 22]},
+      {"store_name": "plut", "list_sid": [29, 30]},
+      {"store_name": "桂林", "list_sid": [31, 32]},
+      {"store_name": "自己把握", "list_sid": [33, 34]},
+      {"store_name": "小伟先生", "list_sid": [35, 36]}
+    ]
   },
   "time_data": {
     "flag_time": "12:00:00.000000",
