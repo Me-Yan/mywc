@@ -308,6 +308,7 @@ class GoodsAction:
                                 try:
                                     visit_count += 1
                                     res_data = self.submit_order(gid=gid, cid=cid, sid=temp_sid, mode=mode)
+                                    # print("------%s....%s...response=%s : %s" % (thread_name, self.nickname, res_data["res_code"], res_data["msg"]))
                                 except BaseException as e:
                                     print(e)
                                 else:
