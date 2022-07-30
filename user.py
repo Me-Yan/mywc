@@ -52,7 +52,7 @@ class User:
 
             goods_list = order_action.list_all_goods(list_sid, page_size)
             if goods_list:
-                sql = order_action.build_sql(goods_list)
+                sql = order_action.build_sql(goods_list, list_sid)
 
                 database = Database()
                 database.clear_goods("DELETE FROM goods")

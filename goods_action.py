@@ -91,7 +91,7 @@ class GoodsAction:
 
         return goods_list
 
-    def build_sql(self, goods_list):
+    def build_sql(self, goods_list, list_sid):
         """构建商品的sql"""
 
         if goods_list:
@@ -103,7 +103,7 @@ class GoodsAction:
                 sid = item['sid']
                 mode = int(item['state'])
                 period = "上午"
-                if sid == 9:
+                if sid == list_sid[1]:
                     period = "下午"
                 name = item['name']
                 base_price = item['base_price']
