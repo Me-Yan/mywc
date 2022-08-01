@@ -63,11 +63,12 @@ class User:
             list_store = self.base_data["activity_data"]["list_store"]
 
             for store in list_store:
-                mor_sid = store["list_sid"][0]
-                after_sid = store["list_sid"][1]
-                goods_list = order_action.list_all_goods(store["list_sid"], page_size)
+                list_sid = store["list_sid"]
+                mor_sid = list_sid[0]
+                after_sid = list_sid[1]
+                goods_list = order_action.list_all_goods(list_sid, page_size)
                 if goods_list:
-                    sql = order_action.build_sql(goods_list)
+                    sql = order_action.build_sql(goods_list, list_sid)
 
                     database = Database()
                     database.clear_goods("DELETE FROM goods")
