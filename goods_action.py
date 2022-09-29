@@ -232,7 +232,7 @@ class GoodsAction:
         else:
             print("------%s....%s..触发时间判断..成功---" % (threading.current_thread().getName(), self.nickname))
 
-    def submit_order(self, gid, cid, sid, mode):
+    def submit_order(self, gid, cid, sid, mode="1"):
         """抢购商品"""
 
         req_url = "%s%s" % (self.basic_path, self.urls["submit_url"])
@@ -241,7 +241,7 @@ class GoodsAction:
             "gid": gid,
             "cid": cid,
             "sid": sid,
-            "mode": "1",
+            "mode": mode,
             "token": "%s" % self.token,
             "address_info": "%s" % self.address_info
         }
@@ -328,7 +328,7 @@ class GoodsAction:
                                         if success_count >= self.count:
                                             success_time = datetime.now().strftime(Util.YYYY_MM_DD_HH_MM_SS_FF)
 
-                                            print("\n------%s......%s.....恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,outcome=%s:%.2f, ,success_time=%s, ,response=(%d, %s)"
+                                            print("\n------%s....%s..恭喜抢购成功...visit_count=%d, ,success_count=%d, ,gid=%d, ,outcome=%s:%.2f, ,success_time=%s, ,response=(%d, %s)"
                                                 % (thread_name, self.nickname, visit_count, success_count, gid, thread_name, price, success_time, res_data["res_code"], res_data["msg"]))
 
                                             break

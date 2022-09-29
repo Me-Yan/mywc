@@ -7,9 +7,10 @@ from database import Database
 
 class User:
 
-    def __init__(self, phone, password, base_data):
+    def __init__(self, phone, password, verify_code, base_data):
         self.phone = phone
         self.password = password
+        self.verify_code = verify_code
         self.base_data = base_data
         self.system_data = base_data["system_data"]
         self.user_data = None
@@ -19,6 +20,9 @@ class User:
             "phone": "%s" % self.phone,
             "pwd": "%s" % self.password
         }
+        if self.verify_code:
+            login_data["sms_code"] = self.verify_code
+
         login_url = "%s%s" % (self.system_data["basic_path"], self.system_data["urls"]["login_url"])
         headers = self.system_data["basic_header"]
 
@@ -41,7 +45,7 @@ class User:
 
         return self
 
-    def buy_goods(self, action="抢购", count=1, min_price=0, max_price=50000, delay_seconds=0, again=False):
+    def buy_goods(self, action="抢购", count=1, min_price=0, max_price=50000, delay_seconds=0, again=False, stable_goods=None):
         """用户购买商品"""
 
         order_action = GoodsAction(base_data=self.base_data, action=action, count=count, min_price=min_price, max_price=max_price, delay_seconds=delay_seconds)
@@ -85,5 +89,29 @@ class User:
             order_action.join_buy()
             order_action.get_user_gtime()
             order_action.loop_submit(again)
+        elif action == "抢购指定":
+            order_action.join_buy()
+            order_action.get_user_gtime()
+
+            if stable_goods is not None:
+                gid = stable_goods["gid"]
+                cid = stable_goods["cid"]
+                sid = stable_goods["sid"]
+
+                current_thread = threading.current_thread()
+                thread_name = current_thread.getName()
+                while True:
+                    res_data = order_action.submit_order(gid, cid, sid)
+
+                    if res_data["msg"] == "抢购成功，请尽快支付!" or res_data["res_code"] == 1:
+                        print(
+                            "\n------%s......%s.....恭喜抢购成功...,gid=%d,response=(%d, %s)"
+                            % (thread_name, self.user_data["nickname"], gid, res_data["res_code"], res_data["msg"]))
+
+                        break
+                    else:
+                        print(
+                            "\n------%s......%s.....抢购失败...,gid=%d, ,response=(%d, %s)"
+                            % (thread_name, self.user_data["nickname"], gid, res_data["res_code"], res_data["msg"]))
 
 
